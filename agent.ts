@@ -2,6 +2,15 @@ import { searchRepo } from "./tools/searchRepo.js";
 import { readFile } from "./tools/readFile.js";
 import { searchFileName } from "./tools/searchFileName.js";
 import { listDir } from "./tools/listDir.js";
+import { getPackageInfo } from "./tools/getPackageInfo.js";
+import { getGitStatus } from "./tools/getGitStatus.js";
+import { getGitHistory } from "./tools/getGitHistory.js";
+import { getGitDiff } from "./tools/getGitDiff.js";
+import { findConfigFiles } from "./tools/findConfigFiles.js";
+import { findSymbols } from "./tools/findSymbols.js";
+import { findTests } from "./tools/findTests.js";
+import { analyzeDependencies } from "./tools/analyzeDependencies.js";
+import { runCommand } from "./tools/runCommand.js";
 
 import { systemPrompt } from "./prompts.js";
 
@@ -72,6 +81,99 @@ const listDirTool = tool(
   },
 );
 
+const getPackageInfoTool = tool(
+  async ({ repoPath }) => JSON.stringify(await getPackageInfo(repoPath)),
+  {
+    name: "get_package_info",
+    description: "Read package.json project metadata and dependencies.",
+    schema: z.object({ repoPath: z.string() }),
+  },
+);
+
+const getGitStatusTool = tool(
+  async ({ repoPath }) => JSON.stringify(await getGitStatus(repoPath)),
+  {
+    name: "get_git_status",
+    description: "Show the repository branch and working tree changes.",
+    schema: z.object({ repoPath: z.string() }),
+  },
+);
+
+const getGitHistoryTool = tool(
+  async ({ repoPath, limit }) =>
+    JSON.stringify(await getGitHistory(repoPath, limit)),
+  {
+    name: "get_git_history",
+    description: "Show recent commits from the repository Git history.",
+    schema: z.object({
+      repoPath: z.string(),
+      limit: z.number().int().positive().optional(),
+    }),
+  },
+);
+
+const getGitDiffTool = tool(
+  async ({ repoPath, from, to }) => getGitDiff(repoPath, from, to),
+  {
+    name: "get_git_diff",
+    description: "Show Git changes between commits, branches, or the working tree.",
+    schema: z.object({
+      repoPath: z.string(),
+      from: z.string().optional(),
+      to: z.string().optional(),
+    }),
+  },
+);
+
+const findConfigFilesTool = tool(
+  async ({ repoPath }) => JSON.stringify(await findConfigFiles(repoPath)),
+  {
+    name: "find_config_files",
+    description: "Find common project, build, container, and CI configuration files.",
+    schema: z.object({ repoPath: z.string() }),
+  },
+);
+
+const findSymbolsTool = tool(
+  async ({ repoPath }) => JSON.stringify(await findSymbols(repoPath)),
+  {
+    name: "find_symbols",
+    description: "Find exported functions, classes, interfaces, and types.",
+    schema: z.object({ repoPath: z.string() }),
+  },
+);
+
+const findTestsTool = tool(
+  async ({ repoPath }) => JSON.stringify(await findTests(repoPath)),
+  {
+    name: "find_tests",
+    description: "Find test and specification files in the repository.",
+    schema: z.object({ repoPath: z.string() }),
+  },
+);
+
+const analyzeDependenciesTool = tool(
+  async ({ repoPath }) => JSON.stringify(await analyzeDependencies(repoPath)),
+  {
+    name: "analyze_dependencies",
+    description: "Analyze package dependencies and identify recognized frameworks.",
+    schema: z.object({ repoPath: z.string() }),
+  },
+);
+
+const runCommandTool = tool(
+  async ({ repoPath, command }) =>
+    JSON.stringify(await runCommand(repoPath, command)),
+  {
+    name: "run_command",
+    description: "Run an allowed repository check such as tests or a build.",
+    schema: z.object({
+      repoPath: z.string(),
+      command: z.enum(["npm test", "npm run build", "npm run lint"]),
+    }),
+  },
+);
+
 const model = new ChatOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   model: "gpt-4o-mini",
@@ -81,6 +183,20 @@ const model = new ChatOpenAI({
 
 export const investigatorAgent = createReactAgent({
   llm: model,
-  tools: [searchRepoTool, readFileTool, searchFileNameTool, listDirTool],
+  tools: [
+    searchRepoTool,
+    readFileTool,
+    searchFileNameTool,
+    listDirTool,
+    getPackageInfoTool,
+    getGitStatusTool,
+    getGitHistoryTool,
+    getGitDiffTool,
+    findConfigFilesTool,
+    findSymbolsTool,
+    findTestsTool,
+    analyzeDependenciesTool,
+    runCommandTool,
+  ],
   prompt: systemPrompt,
 });
