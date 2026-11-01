@@ -1,4 +1,5 @@
 import { searchRepo } from "./tools/searchRepo.js";
+import { readFile } from "./tools/readFile.js";
 import { z } from "zod";
 import { tool } from "@langchain/core/tools";
 import { ChatOpenAI } from "@langchain/openai";
@@ -20,6 +21,20 @@ const searchRepository = tool(
   },
 );
 
+const readFileTool = tool(
+  async ({ repoPath, filePath }) => {
+    return await readFile(repoPath, filePath);
+  },
+  {
+    name: "readFile",
+    description: "Read and return the contents of a file inside a repository.",
+    schema: z.object({
+      repoPath: z.string(),
+      filePath: z.string(),
+    }),
+  },
+);
+
 const model = new ChatOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   model: "gpt-4o-mini",
@@ -29,8 +44,8 @@ const model = new ChatOpenAI({
 
 export const investigatorAgent = createReactAgent({
   llm: model,
-  tools: [searchRepository],
+  tools: [searchRepository, readFileTool],
   prompt:
-    "You investigate local repositories. Use search_repository when needed. " +
-    "Only make claims supported by tool results.",
+    "You investigate local repositories. Use search_repository to find files " +
+    "and readFile to inspect them. Only make claims supported by tool results.",
 });
