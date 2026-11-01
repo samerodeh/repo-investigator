@@ -1,5 +1,6 @@
 import { searchRepo } from "./tools/searchRepo.js";
 import { readFile } from "./tools/readFile.js";
+import { systemPrompt } from "./prompts.js";
 import { z } from "zod";
 import { tool } from "@langchain/core/tools";
 import { ChatOpenAI } from "@langchain/openai";
@@ -45,7 +46,5 @@ const model = new ChatOpenAI({
 export const investigatorAgent = createReactAgent({
   llm: model,
   tools: [searchRepository, readFileTool],
-  prompt:
-    "You investigate local repositories. Use search_repository to find files " +
-    "and readFile to inspect them. Only make claims supported by tool results.",
+  prompt: systemPrompt,
 });
