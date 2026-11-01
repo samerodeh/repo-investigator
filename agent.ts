@@ -1,5 +1,6 @@
 import { searchRepo } from "./tools/searchRepo.js";
 import { readFile } from "./tools/readFile.js";
+import { searchFileName } from "./tools/searchFileName.js";
 import { systemPrompt } from "./prompts.js";
 import { z } from "zod";
 import { tool } from "@langchain/core/tools";
@@ -36,6 +37,20 @@ const readFileTool = tool(
   },
 );
 
+const searchFileNameTool = tool(
+  async ({ repoPath, query }) => {
+    return await searchFileName(repoPath, query);
+  },
+  {
+    name: "search_file_name",
+    description: "Search repository file names and return matching paths.",
+    schema: z.object({
+      repoPath: z.string(),
+      query: z.string(),
+    }),
+  },
+);
+
 const model = new ChatOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   model: "gpt-4o-mini",
@@ -45,6 +60,6 @@ const model = new ChatOpenAI({
 
 export const investigatorAgent = createReactAgent({
   llm: model,
-  tools: [searchRepository, readFileTool],
+  tools: [searchRepository, readFileTool, searchFileNameTool],
   prompt: systemPrompt,
 });
