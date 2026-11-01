@@ -27,10 +27,14 @@ export async function runCommand(
     throw new Error(`Command is not allowed: ${command}`);
   }
 
-  const executable = process.platform === "win32" ? "npm.cmd" : "npm";
+  const executable = process.platform === "win32" ? "cmd.exe" : "npm";
+  const executableArgs =
+    process.platform === "win32"
+      ? ["/d", "/s", "/c", `npm ${args.join(" ")}`]
+      : [...args];
 
   try {
-    const { stdout, stderr } = await execFileAsync(executable, [...args], {
+    const { stdout, stderr } = await execFileAsync(executable, executableArgs, {
       cwd: repoPath,
       maxBuffer: 10 * 1024 * 1024,
     });
@@ -39,13 +43,14 @@ export async function runCommand(
     const commandError = error as {
       stdout?: string;
       stderr?: string;
-      code?: number;
+      code?: number | string;
     };
     return {
       command,
       stdout: commandError.stdout ?? "",
       stderr: commandError.stderr ?? "",
-      exitCode: commandError.code ?? 1,
+      exitCode:
+        typeof commandError.code === "number" ? commandError.code : 1,
     };
   }
 }
