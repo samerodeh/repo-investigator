@@ -1,6 +1,7 @@
 import { searchRepo } from "./tools/searchRepo.js";
 import { readFile } from "./tools/readFile.js";
 import { searchFileName } from "./tools/searchFileName.js";
+import { listDir } from "./tools/listDir.js";
 
 import { systemPrompt } from "./prompts.js";
 
@@ -56,6 +57,21 @@ const searchFileNameTool = tool(
   },
 );
 
+const listDirTool = tool(
+  async ({ repoPath, directoryPath }) => {
+    const result = await listDir(repoPath, directoryPath);
+    return result;
+  },
+  {
+    name: "list_directory",
+    description: "List entries in a repository directory.",
+    schema: z.object({
+      repoPath: z.string(),
+      directoryPath: z.string().optional(),
+    }),
+  },
+);
+
 const model = new ChatOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   model: "gpt-4o-mini",
@@ -65,6 +81,6 @@ const model = new ChatOpenAI({
 
 export const investigatorAgent = createReactAgent({
   llm: model,
-  tools: [searchRepoTool, readFileTool, searchFileNameTool],
+  tools: [searchRepoTool, readFileTool, searchFileNameTool, listDirTool],
   prompt: systemPrompt,
 });
