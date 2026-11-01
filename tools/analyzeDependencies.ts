@@ -28,7 +28,6 @@ export async function analyzeDependencies(
     runtime,
     development,
     frameworks: Object.keys(allDependencies)
-      .filter((name) => frameworkNames[name])
-      .map((name) => frameworkNames[name]),
+      .flatMap((name) => (frameworkNames[name] ? [frameworkNames[name]] : [])),
   };
 }
