@@ -6,7 +6,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "vitest run tests",
+    "test": "vitest run tests --exclude dist/**",
     "dev": "tsx index.ts",
     "build": "tsc"
   },
