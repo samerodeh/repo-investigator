@@ -38,11 +38,17 @@ export async function findSymbols(repoPath: string): Promise<SymbolMatch[]> {
       contents.split(/\r?\n/).forEach((line, index) => {
         const match = line.match(symbolPattern);
         if (match) {
+          const kind = match[1];
+          const name = match[2];
+          if (!kind || !name) {
+            return;
+          }
+
           results.push({
             filePath: fullPath,
             line: index + 1,
-            kind: match[1] as SymbolMatch["kind"],
-            name: match[2],
+            kind: kind as SymbolMatch["kind"],
+            name,
           });
         }
       });
