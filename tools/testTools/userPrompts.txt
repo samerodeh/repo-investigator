@@ -1,0 +1,14 @@
+# test searchRepo:
+
+# test readFile:
+
+# test searchFileName:
+get me every test file in this repo.
+
+# test searchFileName and readFile: 
+find all test files in this repo and show the content of each one.
+
+# test searchFileName and searchRepo: 
+
+# test fileFile and searchRepo: 
+
