@@ -1,14 +1,17 @@
 import { searchRepo } from "./tools/searchRepo.js";
 import { readFile } from "./tools/readFile.js";
 import { searchFileName } from "./tools/searchFileName.js";
+
 import { systemPrompt } from "./prompts.js";
+
 import { z } from "zod";
-import { tool } from "@langchain/core/tools";
-import { ChatOpenAI } from "@langchain/openai";
-import { createReactAgent } from "@langchain/langgraph/prebuilt";
+
+import {tool} from "@langchain/core/tools";
+import {ChatOpenAI} from "@langchain/openai";
+import {createReactAgent} from "@langchain/langgraph/prebuilt";
 
 
-const searchRepository = tool(
+const searchRepoTool = tool(
   async ({ repoPath, query }) => {
     const files = await searchRepo(repoPath, query);
     return JSON.stringify({ query, files });
@@ -25,11 +28,12 @@ const searchRepository = tool(
 
 const readFileTool = tool(
   async ({ repoPath, filePath }) => {
-    return await readFile(repoPath, filePath);
+    const result = await readFile(repoPath, filePath);
+    return result;
   },
   {
     name: "readFile",
-    description: "Read and return the contents of a file inside a repository.",
+    description: "read and return the file contents of that file in the filePath",
     schema: z.object({
       repoPath: z.string(),
       filePath: z.string(),
@@ -39,7 +43,8 @@ const readFileTool = tool(
 
 const searchFileNameTool = tool(
   async ({ repoPath, query }) => {
-    return await searchFileName(repoPath, query);
+    const result = await searchFileName(repoPath, query);
+    return result;
   },
   {
     name: "search_file_name",
@@ -60,6 +65,6 @@ const model = new ChatOpenAI({
 
 export const investigatorAgent = createReactAgent({
   llm: model,
-  tools: [searchRepository, readFileTool, searchFileNameTool],
+  tools: [searchRepoTool, readFileTool, searchFileNameTool],
   prompt: systemPrompt,
 });

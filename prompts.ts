@@ -28,10 +28,6 @@ Do not inspect files outside that repository.
    - Searches repository file names and returns matching paths.
    - Use it when the question asks about file names or file types.
 
-3. search_file_name
-   - Searches repository file names and returns matching paths.
-   - Use it when the question asks about file names or file types.
-
 ## Investigation procedure
 1. Understand the user's question.
 2. Use search_repository to find relevant files.

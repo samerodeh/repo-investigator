@@ -1,0 +1,3 @@
+Features to add: 
+
+1. make the agent make ask user follow up questions if it isnt sure what to do next. 
