@@ -20,7 +20,11 @@ import { createInvestigatorAgent } from "../../agent.js";
 const execFileAsync = promisify(execFile);
 
 class StubChatModel extends BaseChatModel {
-  constructor(private readonly repoPath: string) {
+  constructor(
+    private readonly toolName: string,
+    private readonly toolArgs: Record<string, unknown>,
+    private readonly responsePrefix: string,
+  ) {
     super({});
   }
 
@@ -48,9 +52,9 @@ class StubChatModel extends BaseChatModel {
               content: "",
               tool_calls: [
                 {
-                  name: "get_git_history",
-                  args: { repoPath: this.repoPath, limit: 1 },
-                  id: "history-call",
+                  name: this.toolName,
+                  args: this.toolArgs,
+                  id: "tool-call",
                   type: "tool_call",
                 },
               ],
@@ -65,7 +69,9 @@ class StubChatModel extends BaseChatModel {
       generations: [
         {
           text: String(toolResult),
-          message: new AIMessage(`Recent history: ${String(toolResult)}`),
+          message: new AIMessage(
+            `${this.responsePrefix}: ${String(toolResult)}`,
+          ),
         },
       ],
     };
@@ -104,7 +110,13 @@ describe("investigator agent integration", () => {
         { cwd: repoPath },
       );
 
-      const agent = createInvestigatorAgent(new StubChatModel(repoPath));
+      const agent = createInvestigatorAgent(
+        new StubChatModel(
+          "get_git_history",
+          { repoPath, limit: 1 },
+          "Recent history",
+        ),
+      );
       const result = await agent.invoke({
         messages: [{ role: "user", content: "Show me the Git history." }],
       });
