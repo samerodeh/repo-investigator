@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { findSymbols } from "../tools/findSymbols.js";
+import { findSymbols } from "../../tools/findSymbols.js";
 
 describe("findSymbols", () => {
   it("finds exported functions, classes, interfaces, and types with line numbers", async () => {

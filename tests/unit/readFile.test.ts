@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { readFile } from "../tools/readFile.js";
+import { readFile } from "../../tools/readFile.js";
 
 const temporaryDirectories: string[] = [];
 

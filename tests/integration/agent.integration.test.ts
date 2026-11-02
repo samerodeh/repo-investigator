@@ -15,7 +15,7 @@ import { execFile } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
-import { createInvestigatorAgent } from "../agent.js";
+import { createInvestigatorAgent } from "../../agent.js";
 
 const execFileAsync = promisify(execFile);
 

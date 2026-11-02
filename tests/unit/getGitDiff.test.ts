@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { getGitDiff } from "../tools/getGitDiff.js";
+import { getGitDiff } from "../../tools/getGitDiff.js";
 
 const execFileAsync = promisify(execFile);
 

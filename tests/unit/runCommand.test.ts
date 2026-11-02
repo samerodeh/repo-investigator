@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { runCommand } from "../tools/runCommand.js";
+import { runCommand } from "../../tools/runCommand.js";
 
 describe("runCommand", () => {
   it("runs an allowed build command and returns its result", async () => {

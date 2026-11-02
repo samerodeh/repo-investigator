@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { getGitHistory } from "../tools/getGitHistory.js";
+import { getGitHistory } from "../../tools/getGitHistory.js";
 
 const execFileAsync = promisify(execFile);
 
