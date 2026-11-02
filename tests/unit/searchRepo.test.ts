@@ -20,6 +20,7 @@ async function createFixture() {
   );
   await fs.writeFile(path.join(directory, "node_modules", "ignored.ts"), "JWT");
   await fs.writeFile(path.join(directory, "dist", "ignored.ts"), "JWT");
+  await fs.writeFile(path.join(directory, ".env"), "JWT");
   return directory;
 }
 
@@ -44,5 +45,13 @@ describe("searchRepo", () => {
     const repoPath = await createFixture();
 
     await expect(searchRepo(repoPath, "jWt")).resolves.toHaveLength(1);
+  });
+
+  it("does not search secret-bearing environment files", async () => {
+    const repoPath = await createFixture();
+
+    await expect(searchRepo(repoPath, "jwt")).resolves.not.toContain(
+      path.join(repoPath, ".env"),
+    );
   });
 });
