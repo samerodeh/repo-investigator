@@ -242,4 +242,38 @@ describe("investigator agent integration", () => {
       await fs.rm(repoPath, { recursive: true, force: true });
     }
   });
+
+  it("routes package metadata questions through get_package_info", async () => {
+    const repoPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), "repo-investigator-agent-"),
+    );
+
+    try {
+      await fs.writeFile(
+        path.join(repoPath, "package.json"),
+        JSON.stringify({
+          name: "integration-fixture",
+          type: "module",
+          scripts: { test: "vitest" },
+        }),
+      );
+
+      const result = await invokeTool(
+        "get_package_info",
+        { repoPath },
+        "Show this project's package metadata.",
+        "Package metadata",
+      );
+
+      expect(result.messages.some((message) => message.type === "tool")).toBe(
+        true,
+      );
+      expect(String(result.messages.at(-1)?.content)).toContain(
+        "integration-fixture",
+      );
+      expect(String(result.messages.at(-1)?.content)).toContain("vitest");
+    } finally {
+      await fs.rm(repoPath, { recursive: true, force: true });
+    }
+  });
 });
