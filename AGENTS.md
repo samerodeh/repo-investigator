@@ -70,6 +70,7 @@ npm run build
   investigator agent.
 - `agent.ts`: defines LangChain tools, the OpenAI model, and the LangGraph
   agent.
+- `observability.ts`: creates the optional Langfuse callback handler.
 - `prompts.ts`: contains the multiline system prompt.
 - `state.ts`: contains future custom `InvestigatorState` and `Evidence` types.
 - `tools/searchRepo.ts`: recursively searches file contents.
@@ -135,11 +136,16 @@ npm run build
 - `package-lock.json` is generated and maintained by npm. Update it through npm
   commands when dependencies change.
 - `.env` is local configuration and must not be committed.
+- `.env.example` documents required OpenAI and optional Langfuse variables.
 
 ## Security and safety
 
 - Never commit API keys, credentials, private tokens, or other secrets.
 - Load `OPENAI_API_KEY` from the local environment or `.env`; do not hardcode it.
+- Langfuse tracing is enabled only when both `LANGFUSE_PUBLIC_KEY` and
+  `LANGFUSE_SECRET_KEY` are configured.
+- Never commit Langfuse keys. Use `.env` locally and `.env.example` only for
+  empty variable names and safe defaults.
 - Treat the user-provided repository path as the investigation boundary.
 - Preserve the path validation in `readFile`; never allow reads outside the
   selected repository.
