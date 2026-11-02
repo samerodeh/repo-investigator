@@ -369,4 +369,35 @@ describe("investigator agent integration", () => {
       await fs.rm(repoPath, { recursive: true, force: true });
     }
   });
+
+  it("routes validation questions through the safe command runner", async () => {
+    const repoPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), "repo-investigator-agent-"),
+    );
+
+    try {
+      await fs.writeFile(
+        path.join(repoPath, "package.json"),
+        JSON.stringify({
+          scripts: {
+            build: "node -e \"console.log('integration build passed')\"",
+          },
+        }),
+      );
+
+      const result = await invokeTool(
+        "run_command",
+        { repoPath, command: "npm run build" },
+        "Run the project build.",
+        "Command result",
+      );
+
+      expect(String(result.messages.at(-1)?.content)).toContain(
+        "integration build passed",
+      );
+      expect(String(result.messages.at(-1)?.content)).toContain('"exitCode":0');
+    } finally {
+      await fs.rm(repoPath, { recursive: true, force: true });
+    }
+  });
 });
