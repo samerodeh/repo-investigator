@@ -7,6 +7,7 @@ import { investigatorAgent } from "./agent.js";
 import {
   createLangfuseHandler,
   setupLangfuseTracing,
+  shutdownLangfuseTracing,
 } from "./observability.js";
 
 const repoPath =
@@ -19,10 +20,15 @@ readline.close();
 console.log("Starting investigator...");
 
 try {
-  setupLangfuseTracing();
+  const langfuseSdk = setupLangfuseTracing();
   const langfuseHandler = createLangfuseHandler(randomUUID());
   const invokeConfig = langfuseHandler
-    ? { recursionLimit: 8, callbacks: [langfuseHandler] }
+    ? {
+        recursionLimit: 8,
+        runName: "repo-investigation",
+        metadata: { application: "repo-investigator" },
+        callbacks: [langfuseHandler],
+      }
     : { recursionLimit: 8 };
 
   const result = await investigatorAgent.invoke({
@@ -37,7 +43,11 @@ try {
   }, invokeConfig);
 
   console.log(result.messages.at(-1)?.content);
+  if (langfuseSdk) {
+    await shutdownLangfuseTracing();
+  }
 } catch (error) {
   console.error("Investigator failed:", error);
+  await shutdownLangfuseTracing();
   process.exitCode = 1;
 }

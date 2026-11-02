@@ -21,6 +21,16 @@ export function setupLangfuseTracing(): NodeSDK | undefined {
   return langfuseSdk;
 }
 
+export async function shutdownLangfuseTracing(): Promise<void> {
+  if (!langfuseSdk) {
+    return;
+  }
+
+  const sdk = langfuseSdk;
+  langfuseSdk = undefined;
+  await sdk.shutdown();
+}
+
 export function createLangfuseHandler(sessionId: string): CallbackHandler | undefined {
   if (
     !process.env.LANGFUSE_PUBLIC_KEY ||
@@ -31,6 +41,12 @@ export function createLangfuseHandler(sessionId: string): CallbackHandler | unde
 
   return new CallbackHandler({
     sessionId,
+    version: process.env.npm_package_version ?? "1.0.0",
     tags: ["repo-investigator"],
+    traceMetadata: {
+      application: "repo-investigator",
+      environment:
+        process.env.LANGFUSE_TRACING_ENVIRONMENT ?? "development",
+    },
   });
 }

@@ -144,6 +144,8 @@ npm run build
 - Load `OPENAI_API_KEY` from the local environment or `.env`; do not hardcode it.
 - Langfuse tracing is enabled only when both `LANGFUSE_PUBLIC_KEY` and
   `LANGFUSE_SECRET_KEY` are configured.
+- `LANGFUSE_BASE_URL` must match the Langfuse project region, such as
+  `https://cloud.langfuse.com` for EU or `https://us.cloud.langfuse.com` for US.
 - Never commit Langfuse keys. Use `.env` locally and `.env.example` only for
   empty variable names and safe defaults.
 - Treat the user-provided repository path as the investigation boundary.
