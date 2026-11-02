@@ -86,6 +86,21 @@ class StubChatModel extends BaseChatModel {
   }
 }
 
+async function invokeTool(
+  toolName: string,
+  toolArgs: Record<string, unknown>,
+  question: string,
+  responsePrefix: string,
+) {
+  const agent = createInvestigatorAgent(
+    new StubChatModel(toolName, toolArgs, responsePrefix),
+  );
+
+  return agent.invoke({
+    messages: [{ role: "user", content: question }],
+  });
+}
+
 describe("investigator agent integration", () => {
   it("executes a model-selected Git history tool and returns its result", async () => {
     const repoPath = await fs.mkdtemp(
