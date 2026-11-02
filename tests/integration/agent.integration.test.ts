@@ -326,4 +326,47 @@ describe("investigator agent integration", () => {
       await fs.rm(repoPath, { recursive: true, force: true });
     }
   });
+
+  it("routes source search and file reading questions through the search tools", async () => {
+    const repoPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), "repo-investigator-agent-"),
+    );
+    const sourcePath = path.join(repoPath, "src", "feature.ts");
+
+    try {
+      await fs.mkdir(path.join(repoPath, "src"));
+      await fs.writeFile(sourcePath, "export const importantValue = 42;");
+
+      const contentResult = await invokeTool(
+        "search_repository",
+        { repoPath, query: "importantValue" },
+        "Find where importantValue is used.",
+        "Content search",
+      );
+      const fileNameResult = await invokeTool(
+        "search_file_name",
+        { repoPath, query: "feature" },
+        "Find the feature file.",
+        "Filename search",
+      );
+      const readResult = await invokeTool(
+        "readFile",
+        { repoPath, filePath: sourcePath },
+        "Read the feature source file.",
+        "File contents",
+      );
+
+      expect(String(contentResult.messages.at(-1)?.content)).toContain(
+        "feature.ts",
+      );
+      expect(String(fileNameResult.messages.at(-1)?.content)).toContain(
+        "feature.ts",
+      );
+      expect(String(readResult.messages.at(-1)?.content)).toContain(
+        "importantValue",
+      );
+    } finally {
+      await fs.rm(repoPath, { recursive: true, force: true });
+    }
+  });
 });
