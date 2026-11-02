@@ -131,4 +131,43 @@ describe("investigator agent integration", () => {
       await fs.rm(repoPath, { recursive: true, force: true });
     }
   });
+
+  it("executes a model-selected dependency analysis tool and returns its result", async () => {
+    const repoPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), "repo-investigator-agent-"),
+    );
+
+    try {
+      await fs.writeFile(
+        path.join(repoPath, "package.json"),
+        JSON.stringify({
+          dependencies: {
+            "@langchain/core": "^1.0.0",
+            zod: "^4.0.0",
+          },
+        }),
+      );
+
+      const agent = createInvestigatorAgent(
+        new StubChatModel(
+          "analyze_dependencies",
+          { repoPath },
+          "Dependency analysis",
+        ),
+      );
+      const result = await agent.invoke({
+        messages: [
+          { role: "user", content: "Analyze this project's dependencies." },
+        ],
+      });
+
+      expect(result.messages.some((message) => message.type === "tool")).toBe(
+        true,
+      );
+      expect(String(result.messages.at(-1)?.content)).toContain("LangChain");
+      expect(String(result.messages.at(-1)?.content)).toContain("Zod");
+    } finally {
+      await fs.rm(repoPath, { recursive: true, force: true });
+    }
+  });
 });
