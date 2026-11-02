@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { getPackageInfo } from "../tools/getPackageInfo.js";
+import { getPackageInfo } from "../../tools/getPackageInfo.js";
 
 describe("getPackageInfo", () => {
   it("reads package metadata and dependency sections", async () => {

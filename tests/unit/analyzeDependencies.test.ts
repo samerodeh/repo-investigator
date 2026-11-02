@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { analyzeDependencies } from "../tools/analyzeDependencies.js";
+import { analyzeDependencies } from "../../tools/analyzeDependencies.js";
 
 describe("analyzeDependencies", () => {
   it("separates dependency groups and identifies known frameworks", async () => {

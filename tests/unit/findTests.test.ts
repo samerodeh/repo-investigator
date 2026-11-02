@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
-import { findTests } from "../tools/findTests.js";
+import { findTests } from "../../tools/findTests.js";
 
 describe("findTests", () => {
   it("finds test and spec files recursively while skipping ignored directories", async () => {

@@ -18,6 +18,7 @@ import { z } from "zod";
 
 import {tool} from "@langchain/core/tools";
 import {ChatOpenAI} from "@langchain/openai";
+import type { LanguageModelLike } from "@langchain/core/language_models/base";
 import {createReactAgent} from "@langchain/langgraph/prebuilt";
 
 
@@ -181,22 +182,26 @@ const model = new ChatOpenAI({
   timeout: 30000,
 });
 
-export const investigatorAgent = createReactAgent({
-  llm: model,
-  tools: [
-    searchRepoTool,
-    readFileTool,
-    searchFileNameTool,
-    listDirTool,
-    getPackageInfoTool,
-    getGitStatusTool,
-    getGitHistoryTool,
-    getGitDiffTool,
-    findConfigFilesTool,
-    findSymbolsTool,
-    findTestsTool,
-    analyzeDependenciesTool,
-    runCommandTool,
-  ],
-  prompt: systemPrompt,
-});
+export function createInvestigatorAgent(llm: LanguageModelLike = model) {
+  return createReactAgent({
+    llm,
+    tools: [
+      searchRepoTool,
+      readFileTool,
+      searchFileNameTool,
+      listDirTool,
+      getPackageInfoTool,
+      getGitStatusTool,
+      getGitHistoryTool,
+      getGitDiffTool,
+      findConfigFilesTool,
+      findSymbolsTool,
+      findTestsTool,
+      analyzeDependenciesTool,
+      runCommandTool,
+    ],
+    prompt: systemPrompt,
+  });
+}
+
+export const investigatorAgent = createInvestigatorAgent();

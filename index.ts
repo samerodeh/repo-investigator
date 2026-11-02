@@ -2,7 +2,12 @@ import "dotenv/config";
 
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
+import { randomUUID } from "node:crypto";
 import { investigatorAgent } from "./agent.js";
+import {
+  createLangfuseHandler,
+  setupLangfuseTracing,
+} from "./observability.js";
 
 const repoPath =
   "C:\\Users\\Samer\\OneDrive\\Desktop\\code\\projects\\repo_investigator";
@@ -14,6 +19,12 @@ readline.close();
 console.log("Starting investigator...");
 
 try {
+  setupLangfuseTracing();
+  const langfuseHandler = createLangfuseHandler(randomUUID());
+  const invokeConfig = langfuseHandler
+    ? { recursionLimit: 8, callbacks: [langfuseHandler] }
+    : { recursionLimit: 8 };
+
   const result = await investigatorAgent.invoke({
     messages: [
       {
@@ -23,9 +34,7 @@ try {
           `Question: ${question}`,
       },
     ],
-  }, {
-    recursionLimit: 8,
-  });
+  }, invokeConfig);
 
   console.log(result.messages.at(-1)?.content);
 } catch (error) {
