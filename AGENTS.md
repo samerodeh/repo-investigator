@@ -52,8 +52,17 @@ Run the filename-search smoke test:
 npx tsx .\tools\testTools\searchFileName.test.ts
 ```
 
-There is currently no configured full test runner. Do not treat the placeholder
-`npm test` script as a passing validation command.
+Run the automated CI test suite:
+
+```powershell
+npm test
+```
+
+Run the TypeScript build:
+
+```powershell
+npm run build
+```
 
 ## Repository map
 
@@ -66,7 +75,18 @@ There is currently no configured full test runner. Do not treat the placeholder
 - `tools/searchRepo.ts`: recursively searches file contents.
 - `tools/readFile.ts`: safely reads one file inside the repository boundary.
 - `tools/searchFileName.ts`: recursively searches file names.
+- `tools/listDir.ts`: lists immediate repository directory entries.
+- `tools/getPackageInfo.ts`: reads package metadata, scripts, and dependencies.
+- `tools/getGitStatus.ts`: reports the current branch and working tree changes.
+- `tools/getGitHistory.ts`: returns recent Git commits.
+- `tools/getGitDiff.ts`: returns Git diffs for revisions or the working tree.
+- `tools/findConfigFiles.ts`: finds common project and CI configuration files.
+- `tools/findSymbols.ts`: finds exported source symbols.
+- `tools/findTests.ts`: finds test and specification files.
+- `tools/analyzeDependencies.ts`: summarizes dependencies and known frameworks.
+- `tools/runCommand.ts`: runs an explicit allowlist of npm checks.
 - `tools/testTools/`: executable smoke tests for the repository tools.
+- `tests/`: automated Vitest tests used by CI.
 - `docs/architecture.md`: architecture reference.
 - `package.json`: scripts and dependencies.
 - `tsconfig.json`: TypeScript and Node ESM configuration.
@@ -98,9 +118,10 @@ There is currently no configured full test runner. Do not treat the placeholder
 ## Testing rules
 
 - Add or update a focused smoke test when changing a repository tool.
+- Add or update an automated Vitest test for each new or changed tool behavior.
 - Run the smallest relevant tool test while developing.
-- Run all three tool smoke tests and `npm run build` before declaring work
-  complete.
+- Run `npm test`, all repository tool smoke tests, and `npm run build` before
+  declaring work complete.
 - Review the final diff with Git before committing.
 - Report the exact validation commands that passed or failed.
 - Do not claim that the full agent workflow passed without making a real model
