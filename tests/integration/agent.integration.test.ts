@@ -185,4 +185,61 @@ describe("investigator agent integration", () => {
       await fs.rm(repoPath, { recursive: true, force: true });
     }
   });
+
+  it("routes filesystem discovery questions through the matching tools", async () => {
+    const repoPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), "repo-investigator-agent-"),
+    );
+
+    try {
+      await fs.mkdir(path.join(repoPath, "src"));
+      await fs.writeFile(
+        path.join(repoPath, "src", "feature.ts"),
+        "export function feature() { return true; }\n",
+      );
+      await fs.writeFile(path.join(repoPath, "src", "feature.test.ts"), "");
+      await fs.writeFile(path.join(repoPath, "tsconfig.json"), "{}");
+
+      const listResult = await invokeTool(
+        "list_directory",
+        { repoPath },
+        "List the repository directory.",
+        "Directory listing",
+      );
+      const configResult = await invokeTool(
+        "find_config_files",
+        { repoPath },
+        "Find project configuration files.",
+        "Configuration files",
+      );
+      const symbolResult = await invokeTool(
+        "find_symbols",
+        { repoPath },
+        "Find exported symbols.",
+        "Symbols",
+      );
+      const testResult = await invokeTool(
+        "find_tests",
+        { repoPath },
+        "Find test files.",
+        "Tests",
+      );
+
+      expect(listResult.messages.some((message) => message.type === "tool")).toBe(
+        true,
+      );
+      expect(String(listResult.messages.at(-1)?.content)).toContain("src");
+      expect(String(configResult.messages.at(-1)?.content)).toContain(
+        "tsconfig.json",
+      );
+      expect(String(symbolResult.messages.at(-1)?.content)).toContain(
+        "feature",
+      );
+      expect(String(testResult.messages.at(-1)?.content)).toContain(
+        "feature.test.ts",
+      );
+    } finally {
+      await fs.rm(repoPath, { recursive: true, force: true });
+    }
+  });
 });
