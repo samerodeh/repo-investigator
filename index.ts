@@ -17,6 +17,10 @@ console.log("Starting investigator...");
 
 try {
   const langfuseHandler = createLangfuseHandler(randomUUID());
+  const invokeConfig = langfuseHandler
+    ? { recursionLimit: 8, callbacks: [langfuseHandler] }
+    : { recursionLimit: 8 };
+
   const result = await investigatorAgent.invoke({
     messages: [
       {
@@ -26,10 +30,7 @@ try {
           `Question: ${question}`,
       },
     ],
-  }, {
-    recursionLimit: 8,
-    callbacks: langfuseHandler ? [langfuseHandler] : undefined,
-  });
+  }, invokeConfig);
 
   console.log(result.messages.at(-1)?.content);
 } catch (error) {
