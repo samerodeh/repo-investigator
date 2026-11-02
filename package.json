@@ -6,9 +6,11 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "vitest run tests --exclude dist/**",
+    "test": "vitest run tests/unit tests/integration --exclude dist/**",
     "dev": "tsx index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "test:unit": "vitest run tests/unit --exclude dist/**",
+    "test:integration": "vitest run tests/integration --exclude dist/**"
   },
   "keywords": [],
   "author": "",
