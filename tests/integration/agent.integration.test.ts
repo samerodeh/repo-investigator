@@ -276,4 +276,54 @@ describe("investigator agent integration", () => {
       await fs.rm(repoPath, { recursive: true, force: true });
     }
   });
+
+  it("routes Git status and diff questions through their tools", async () => {
+    const repoPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), "repo-investigator-agent-"),
+    );
+
+    try {
+      await execFileAsync("git", ["init", "-b", "main"], { cwd: repoPath });
+      await fs.writeFile(path.join(repoPath, "file.txt"), "before");
+      await execFileAsync("git", ["add", "."], { cwd: repoPath });
+      await execFileAsync(
+        "git",
+        [
+          "-c",
+          "user.name=Test User",
+          "-c",
+          "user.email=test@example.com",
+          "commit",
+          "-m",
+          "initial fixture",
+        ],
+        { cwd: repoPath },
+      );
+      const firstCommit = (
+        await execFileAsync("git", ["rev-parse", "HEAD"], { cwd: repoPath })
+      ).stdout.trim();
+      await fs.writeFile(path.join(repoPath, "file.txt"), "after");
+
+      const statusResult = await invokeTool(
+        "get_git_status",
+        { repoPath },
+        "Show the Git status.",
+        "Git status",
+      );
+      const diffResult = await invokeTool(
+        "get_git_diff",
+        { repoPath, from: firstCommit },
+        "Show the current Git diff.",
+        "Git diff",
+      );
+
+      expect(String(statusResult.messages.at(-1)?.content)).toContain(
+        "file.txt",
+      );
+      expect(String(diffResult.messages.at(-1)?.content)).toContain("-before");
+      expect(String(diffResult.messages.at(-1)?.content)).toContain("+after");
+    } finally {
+      await fs.rm(repoPath, { recursive: true, force: true });
+    }
+  });
 });
